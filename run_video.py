@@ -103,10 +103,10 @@ def main():
         image_landmark = np.concatenate([resize(black_image), image_bgr], axis=1)
         image_all = np.concatenate([resize(frame_resize), resize(black_image), image_bgr], axis=1)
 
-        if args.display_landmark == 0:
-            cv2.imshow('frame', image_normal)
-        else:
-            cv2.imshow('frame', image_all)
+        # if args.display_landmark == 0:
+        #     cv2.imshow('frame', image_normal)
+        # else:
+        #     cv2.imshow('frame', image_all)
 
         cv2.imwrite('/tmp/image%09d.jpg'%counter,image_all)
         cv2.imwrite('/tmp/face/gen/image%09d.jpg'%counter,image_bgr)
@@ -134,7 +134,7 @@ def main():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-src', '--source', dest='video_source', type=int,
+    parser.add_argument('-src', '--source', dest='video_source', type=str,
                         default=0, help='Device index of the camera.')
     parser.add_argument('--show', dest='display_landmark', type=int, default=0, choices=[0, 1],
                         help='0 shows the normal input and 1 the facial landmark.')

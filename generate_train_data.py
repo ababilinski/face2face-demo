@@ -6,7 +6,7 @@ import argparse
 import numpy as np
 from imutils import video
 
-DOWNSAMPLE_RATIO = 4
+DOWNSAMPLE_RATIO = 2
 
 
 def reshape_for_polyline(array):
@@ -16,14 +16,20 @@ def reshape_for_polyline(array):
 def main():
     os.makedirs('original', exist_ok=True)
     os.makedirs('landmarks', exist_ok=True)
+    os.makedirs('rendered', exist_ok=True)
 
     cap = cv2.VideoCapture(args.filename)
     fps = video.FPS().start()
 
     count = 0
     while cap.isOpened():
-        ret, frame = cap.read()
+        for tmp in range(10):
+            ret, frame = cap.read()
+            if ret is None:
+                break
 
+        if ret is None:
+            break
         frame_resize = cv2.resize(frame, None, fx=1 / DOWNSAMPLE_RATIO, fy=1 / DOWNSAMPLE_RATIO)
         gray = cv2.cvtColor(frame_resize, cv2.COLOR_BGR2GRAY)
         faces = detector(gray, 1)
@@ -65,6 +71,11 @@ def main():
             print(count)
             cv2.imwrite("original/{}.png".format(count), frame)
             cv2.imwrite("landmarks/{}.png".format(count), black_image)
+            tmpimage = frame.copy()
+            tmpimage[black_image>0]=255
+            cv2.imwrite("rendered/{}.png".format(count), tmpimage)
+            # cv2.imshow('img',cv2.resize(cv2.addWeighted(frame, 0.5, black_image, 0.5, 0.0), None, fx=0.5, fy=0.5))
+            # cv2.imshow('img',cv2.resize(tmpimage, None, fx=0.5, fy=0.5))
             fps.update()
 
             print('[INFO] elapsed time: {:.2f}'.format(time.time() - t))
