@@ -1,5 +1,8 @@
 # face2face-demo
 
+
+![Face2Face Gonciarz](zapytaj-beczke.gif)
+
 This repo is forked from [https://github.com/datitran/face2face-demo](https://github.com/datitran/face2face-demo). Thanks Dat Tran for awesome work!
 
 This is a pix2pix demo that learns from facial landmarks and translates this into a face. A webcam-enabled application is also provided that translates your face to the trained face in real-time.
@@ -151,9 +154,6 @@ Me, my face and output:
 
 ![Face2Face Gonciarz](example-gonciarz.gif)
 
-Mieciu Mietczynski, his face and output:
-
-![Face2Face Gonciarz](zapytaj-beczke.gif)
 
 Video on youtube:
 
