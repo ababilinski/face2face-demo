@@ -146,7 +146,7 @@ Input:
 
 **THIS MODEL WILL NOT WORK WITH THIS CODE**
 
-Pre-trained frozen model [here](https://u7410512.dl.dropboxusercontent.com/u/7410512/face2face-demo/face2face_model_epoch_200.zip). This model is trained on 400 images with epoch 200.
+Pre-trained frozen model [here](https://dl.dropboxusercontent.com/s/rzfaoeb3e2ta343/face2face_model_epoch_200.zip). This model is trained on 400 images with epoch 200.
 
 ### Karol Majek - Krzysztof Gonciarz 1024x1024
 
