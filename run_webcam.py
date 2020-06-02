@@ -49,6 +49,9 @@ def main():
     # OpenCV
     cap = cv2.VideoCapture(args.video_source)
     print(cap)
+     fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    
+    out = cv2.VideoWriter('output.avi',fourcc, cap.get(cv2.CAP_PROP_FPS),(1024*3,1024))
     ret,frame = cap.read()
     if frame is None:
         cap = cv2.VideoCapture(int(args.video_source))
@@ -102,6 +105,8 @@ def main():
         image_normal = np.concatenate([resize(frame_resize), image_bgr], axis=1)
         image_landmark = np.concatenate([resize(black_image), image_bgr], axis=1)
         image_all = np.concatenate([resize(frame_resize), resize(black_image), image_bgr], axis=1)
+        if args.save_video == 1:
+                out.write(image_all)
 
         if args.display_landmark == 0:
             cv2.imshow('frame', image_normal)
@@ -126,7 +131,7 @@ def main():
     fps.stop()
     print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
     print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
-
+    out.release()
     sess.close()
     cap.release()
     cv2.destroyAllWindows()
@@ -140,7 +145,8 @@ if __name__ == '__main__':
                         help='0 shows the normal input and 1 the facial landmark.')
     parser.add_argument('--landmark-model', dest='face_landmark_shape_file', type=str, help='Face landmark model file.')
     parser.add_argument('--tf-model', dest='frozen_model_file', type=str, help='Frozen TensorFlow model file.')
-
+parser.add_argument('--save', dest='save_video', type=int, default=0, choices=[0, 1],
+                        help='0 save video to output.avi.')
     args = parser.parse_args()
 
     # Create the face predictor and landmark predictor

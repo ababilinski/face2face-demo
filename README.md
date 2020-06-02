@@ -137,7 +137,21 @@ python run_webcam.py --source 0 --show 0 --landmark-model shape_predictor_68_fac
 - `show` is an option to either display the normal input (0) or the facial landmark (1) alongside the generated image (default=0).
 - `landmark-model` is the facial landmark model that is used to detect the landmarks.
 - `tf-model` is the frozen model file.
+- `save` save video to output.avi (default= 0 = false).
 
+### 5. Run Video Demo
+
+```
+python run_video.py --source path/to/video.mp4 --show 1 --landmark-model shape_predictor_68_face_landmarks.dat --tf-model face2face-reduced-model/frozen_model.pb --save 1
+```
+
+Input:
+
+- `source` path to video.
+- `show` is an option to either display the normal input (0) or the facial landmark (1) alongside the generated image (default=0).
+- `landmark-model` is the facial landmark model that is used to detect the landmarks.
+- `tf-model` is the frozen model file.
+- `save` save video to output.avi (default= 0 = false).
 
 ## Models
 

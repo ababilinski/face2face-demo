@@ -8,6 +8,12 @@ from imutils import video
 CROP_SIZE = 1024
 DOWNSAMPLE_RATIO = 1
 
+def RepresentsInt(s):
+    try: 
+        int(s)
+        return True
+    except ValueError:
+        return False
 
 def reshape_for_polyline(array):
     """Reshape image so that it works with polyline."""
@@ -49,95 +55,186 @@ def main():
     # OpenCV
     cap = cv2.VideoCapture(args.video_source)
     print(cap)
+    fourcc = cv2.VideoWriter_fourcc(*'XVID')
+    
+    out = cv2.VideoWriter('output.avi',fourcc, cap.get(cv2.CAP_PROP_FPS),(1024*3,1024))
+
     ret,frame = cap.read()
     if frame is None:
         cap = cv2.VideoCapture(int(args.video_source))
 
     fps = video.FPS().start()
     counter =0
-    while True:
-        # for i in range(10):
-        ret, frame = cap.read()
+    if RepresentsInt(args.video_source):
+        while True:
+            # for i in range(10):
+            ret, frame = cap.read()
 
-        # frame=frame[150:-200,:,:]
+            # frame=frame[150:-200,:,:]
 
-        # resize image and detect face
-        frame_resize = cv2.resize(frame, None, fx=1 / DOWNSAMPLE_RATIO, fy=1 / DOWNSAMPLE_RATIO)
-        gray = cv2.cvtColor(frame_resize, cv2.COLOR_BGR2GRAY)
-        faces = detector(gray, 1)
-        black_image = np.zeros(frame.shape, np.uint8)
+            # resize image and detect face
+            frame_resize = cv2.resize(frame, None, fx=1 / DOWNSAMPLE_RATIO, fy=1 / DOWNSAMPLE_RATIO)
+            gray = cv2.cvtColor(frame_resize, cv2.COLOR_BGR2GRAY)
+            faces = detector(gray, 1)
+            black_image = np.zeros(frame.shape, np.uint8)
 
-        for face in faces:
-            detected_landmarks = predictor(gray, face).parts()
-            landmarks = [[p.x * DOWNSAMPLE_RATIO, p.y * DOWNSAMPLE_RATIO] for p in detected_landmarks]
+            for face in faces:
+                detected_landmarks = predictor(gray, face).parts()
+                landmarks = [[p.x * DOWNSAMPLE_RATIO, p.y * DOWNSAMPLE_RATIO] for p in detected_landmarks]
 
-            jaw = reshape_for_polyline(landmarks[0:17])
-            left_eyebrow = reshape_for_polyline(landmarks[22:27])
-            right_eyebrow = reshape_for_polyline(landmarks[17:22])
-            nose_bridge = reshape_for_polyline(landmarks[27:31])
-            lower_nose = reshape_for_polyline(landmarks[30:35])
-            left_eye = reshape_for_polyline(landmarks[42:48])
-            right_eye = reshape_for_polyline(landmarks[36:42])
-            outer_lip = reshape_for_polyline(landmarks[48:60])
-            inner_lip = reshape_for_polyline(landmarks[60:68])
+                jaw = reshape_for_polyline(landmarks[0:17])
+                left_eyebrow = reshape_for_polyline(landmarks[22:27])
+                right_eyebrow = reshape_for_polyline(landmarks[17:22])
+                nose_bridge = reshape_for_polyline(landmarks[27:31])
+                lower_nose = reshape_for_polyline(landmarks[30:35])
+                left_eye = reshape_for_polyline(landmarks[42:48])
+                right_eye = reshape_for_polyline(landmarks[36:42])
+                outer_lip = reshape_for_polyline(landmarks[48:60])
+                inner_lip = reshape_for_polyline(landmarks[60:68])
 
-            color = (255, 255, 255)
-            thickness = 3
+                color = (255, 255, 255)
+                thickness = 3
 
-            cv2.polylines(black_image, [jaw], False, color, thickness)
-            cv2.polylines(black_image, [left_eyebrow], False, color, thickness)
-            cv2.polylines(black_image, [right_eyebrow], False, color, thickness)
-            cv2.polylines(black_image, [nose_bridge], False, color, thickness)
-            cv2.polylines(black_image, [lower_nose], True, color, thickness)
-            cv2.polylines(black_image, [left_eye], True, color, thickness)
-            cv2.polylines(black_image, [right_eye], True, color, thickness)
-            cv2.polylines(black_image, [outer_lip], True, color, thickness)
-            cv2.polylines(black_image, [inner_lip], True, color, thickness)
+                cv2.polylines(black_image, [jaw], False, color, thickness)
+                cv2.polylines(black_image, [left_eyebrow], False, color, thickness)
+                cv2.polylines(black_image, [right_eyebrow], False, color, thickness)
+                cv2.polylines(black_image, [nose_bridge], False, color, thickness)
+                cv2.polylines(black_image, [lower_nose], True, color, thickness)
+                cv2.polylines(black_image, [left_eye], True, color, thickness)
+                cv2.polylines(black_image, [right_eye], True, color, thickness)
+                cv2.polylines(black_image, [outer_lip], True, color, thickness)
+                cv2.polylines(black_image, [inner_lip], True, color, thickness)
 
-        # generate prediction
-        combined_image = np.concatenate([resize(black_image), resize(frame_resize)], axis=1)
-        image_rgb = cv2.cvtColor(combined_image, cv2.COLOR_BGR2RGB)  # OpenCV uses BGR instead of RGB
-        generated_image = sess.run(output_tensor, feed_dict={image_tensor: image_rgb})
-        image_bgr = cv2.cvtColor(np.squeeze(generated_image), cv2.COLOR_RGB2BGR)
-        image_normal = np.concatenate([resize(frame_resize), image_bgr], axis=1)
-        image_landmark = np.concatenate([resize(black_image), image_bgr], axis=1)
-        image_all = np.concatenate([resize(frame_resize), resize(black_image), image_bgr], axis=1)
+            # generate prediction
+            combined_image = np.concatenate([resize(black_image), resize(frame_resize)], axis=1)
+            image_rgb = cv2.cvtColor(combined_image, cv2.COLOR_BGR2RGB)  # OpenCV uses BGR instead of RGB
+            generated_image = sess.run(output_tensor, feed_dict={image_tensor: image_rgb})
+            image_bgr = cv2.cvtColor(np.squeeze(generated_image), cv2.COLOR_RGB2BGR)
+            image_normal = np.concatenate([resize(frame_resize), image_bgr], axis=1)
+            image_landmark = np.concatenate([resize(black_image), image_bgr], axis=1)
+            image_all = np.concatenate([resize(frame_resize), resize(black_image), image_bgr], axis=1)
+            if args.save_video == 1:
+                out.write(image_all)
+            # if args.display_landmark == 0:
+            #     cv2.imshow('frame', image_normal)
+            # else:
+            #     cv2.imshow('frame', image_all)
+            if RepresentsInt(args.video_source) == False:
+                cv2.imshow('frame', image_all)
 
-        # if args.display_landmark == 0:
-        #     cv2.imshow('frame', image_normal)
-        # else:
-        #     cv2.imshow('frame', image_all)
+            cv2.imwrite('/tmp/image%09d.jpg'%counter,image_all)
+            cv2.imwrite('/tmp/face/gen/image%09d.jpg'%counter,image_bgr)
+            cv2.imwrite('/tmp/face/face/image%09d.jpg'%counter,resize(black_image))
+            cv2.imwrite('/tmp/face/input/image%09d.jpg'%counter,resize(frame_resize))
+            if len(faces)>0:
+                cv2.imwrite('/tmp/face/mix/image%09d.jpg'%counter,image_bgr)
+            else:
+                cv2.imwrite('/tmp/face/mix/image%09d.jpg'%counter,resize(frame_resize))
 
-        cv2.imwrite('/tmp/image%09d.jpg'%counter,image_all)
-        cv2.imwrite('/tmp/face/gen/image%09d.jpg'%counter,image_bgr)
-        cv2.imwrite('/tmp/face/face/image%09d.jpg'%counter,resize(black_image))
-        cv2.imwrite('/tmp/face/input/image%09d.jpg'%counter,resize(frame_resize))
-        if len(faces)>0:
-            cv2.imwrite('/tmp/face/mix/image%09d.jpg'%counter,image_bgr)
-        else:
-            cv2.imwrite('/tmp/face/mix/image%09d.jpg'%counter,resize(frame_resize))
+            counter = counter+1
 
-        counter = counter+1
+            fps.update()
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
-        fps.update()
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        fps.stop()
+        print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
+        print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
 
-    fps.stop()
-    print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
-    print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
+        sess.close()
+        cap.release()
+        out.release()
+        cv2.destroyAllWindows()
+    else:
+        while(cap.isOpened()):
+            # for i in range(10):
+            ret, frame = cap.read()
+            if ret==True:
+            # frame=frame[150:-200,:,:]
 
-    sess.close()
-    cap.release()
-    cv2.destroyAllWindows()
+            # resize image and detect face
+                frame_resize = cv2.resize(frame, None, fx=1 / DOWNSAMPLE_RATIO, fy=1 / DOWNSAMPLE_RATIO)
+                gray = cv2.cvtColor(frame_resize, cv2.COLOR_BGR2GRAY)
+                faces = detector(gray, 1)
+                black_image = np.zeros(frame.shape, np.uint8)
 
+                for face in faces:
+                    detected_landmarks = predictor(gray, face).parts()
+                    landmarks = [[p.x * DOWNSAMPLE_RATIO, p.y * DOWNSAMPLE_RATIO] for p in detected_landmarks]
+
+                    jaw = reshape_for_polyline(landmarks[0:17])
+                    left_eyebrow = reshape_for_polyline(landmarks[22:27])
+                    right_eyebrow = reshape_for_polyline(landmarks[17:22])
+                    nose_bridge = reshape_for_polyline(landmarks[27:31])
+                    lower_nose = reshape_for_polyline(landmarks[30:35])
+                    left_eye = reshape_for_polyline(landmarks[42:48])
+                    right_eye = reshape_for_polyline(landmarks[36:42])
+                    outer_lip = reshape_for_polyline(landmarks[48:60])
+                    inner_lip = reshape_for_polyline(landmarks[60:68])
+
+                    color = (255, 255, 255)
+                    thickness = 3
+
+                    cv2.polylines(black_image, [jaw], False, color, thickness)
+                    cv2.polylines(black_image, [left_eyebrow], False, color, thickness)
+                    cv2.polylines(black_image, [right_eyebrow], False, color, thickness)
+                    cv2.polylines(black_image, [nose_bridge], False, color, thickness)
+                    cv2.polylines(black_image, [lower_nose], True, color, thickness)
+                    cv2.polylines(black_image, [left_eye], True, color, thickness)
+                    cv2.polylines(black_image, [right_eye], True, color, thickness)
+                    cv2.polylines(black_image, [outer_lip], True, color, thickness)
+                    cv2.polylines(black_image, [inner_lip], True, color, thickness)
+
+                 # generate prediction
+                combined_image = np.concatenate([resize(black_image), resize(frame_resize)], axis=1)
+                image_rgb = cv2.cvtColor(combined_image, cv2.COLOR_BGR2RGB)  # OpenCV uses BGR instead of RGB
+                generated_image = sess.run(output_tensor, feed_dict={image_tensor: image_rgb})
+                image_bgr = cv2.cvtColor(np.squeeze(generated_image), cv2.COLOR_RGB2BGR)
+                image_normal = np.concatenate([resize(frame_resize), image_bgr], axis=1)
+                image_landmark = np.concatenate([resize(black_image), image_bgr], axis=1)
+                image_all = np.concatenate([resize(frame_resize), resize(black_image), image_bgr], axis=1)
+               
+                out.write(image_all)
+                # if args.display_landmark == 0:
+                #     cv2.imshow('frame', image_normal)
+                # else:
+                #     cv2.imshow('frame', image_all)
+                if RepresentsInt(args.video_source) == False:
+                    cv2.imshow('frame', image_all)
+
+                cv2.imwrite('/tmp/image%09d.jpg'%counter,image_all)
+                cv2.imwrite('/tmp/face/gen/image%09d.jpg'%counter,image_bgr)
+                cv2.imwrite('/tmp/face/face/image%09d.jpg'%counter,resize(black_image))
+                cv2.imwrite('/tmp/face/input/image%09d.jpg'%counter,resize(frame_resize))
+                if len(faces)>0:
+                    cv2.imwrite('/tmp/face/mix/image%09d.jpg'%counter,image_bgr)
+                else:
+                    cv2.imwrite('/tmp/face/mix/image%09d.jpg'%counter,resize(frame_resize))
+
+                counter = counter+1
+
+                fps.update()
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+            else:
+                break
+
+        fps.stop()
+        print('[INFO] elapsed time (total): {:.2f}'.format(fps.elapsed()))
+        print('[INFO] approx. FPS: {:.2f}'.format(fps.fps()))
+        sess.close()
+        cap.release()
+        out.release()
+        cv2.destroyAllWindows()   
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-src', '--source', dest='video_source', type=str,
-                        default=0, help='Device index of the camera.')
+                        default=0, help='Device index of the camera. or video path')
     parser.add_argument('--show', dest='display_landmark', type=int, default=0, choices=[0, 1],
                         help='0 shows the normal input and 1 the facial landmark.')
+    parser.add_argument('--save', dest='save_video', type=int, default=0, choices=[0, 1],
+                        help='0 save video to output.avi.')
     parser.add_argument('--landmark-model', dest='face_landmark_shape_file', type=str, help='Face landmark model file.')
     parser.add_argument('--tf-model', dest='frozen_model_file', type=str, help='Frozen TensorFlow model file.')
 
