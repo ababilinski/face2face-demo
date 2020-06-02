@@ -153,7 +153,6 @@ Input:
 - `tf-model` is the frozen model file.
 - `save` save video to output.avi (default= 0 = false).
 
-
 ## Models
 
 ### Dat Tran - Angela Merkel 256x256
