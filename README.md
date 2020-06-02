@@ -90,7 +90,11 @@ python pix2pix.py \
   --max_epochs 200 \
   --input_dir photos/combined/train \
   --which_direction AtoB
+
+# View training progress
+tensorboard --logdir face2face-model
 ```
+> To view the training progress after starting tensorboard navigate to [http://localhost:6006/](http://localhost:6006/) 
 
 For more information around training, have a look at Christopher Hesse's [pix2pix-tensorflow](https://github.com/affinelayer/pix2pix-tensorflow) implementation.
 
@@ -123,19 +127,31 @@ For more information around training, have a look at Christopher Hesse's [pix2pi
 
     - It returns a frozen model file `frozen_model.pb` in the model folder.
 
-### 5. Run Demo
+### 5. Run Webcam Demo
 
 ```
 python run_webcam.py --source 0 --show 0 --landmark-model shape_predictor_68_face_landmarks.dat --tf-model face2face-reduced-model/frozen_model.pb
 ```
 
-Input:
-
 - `source` is the device index of the camera (default=0).
 - `show` is an option to either display the normal input (0) or the facial landmark (1) alongside the generated image (default=0).
 - `landmark-model` is the facial landmark model that is used to detect the landmarks.
 - `tf-model` is the frozen model file.
+- `save` save video to output.avi (default= 0 = false).
 
+### 5. Run Video Demo
+
+```
+python run_video.py --source path/to/video.mp4 --show 1 --landmark-model shape_predictor_68_face_landmarks.dat --tf-model face2face-reduced-model/frozen_model.pb --save 1
+```
+
+Input:
+
+- `source` path to video.
+- `show` is an option to either display the normal input (0) or the facial landmark (1) alongside the generated image (default=0).
+- `landmark-model` is the facial landmark model that is used to detect the landmarks.
+- `tf-model` is the frozen model file.
+- `save` save video to output.avi (default= 0 = false).
 
 
 ## Models
@@ -148,9 +164,15 @@ Input:
 
 Pre-trained frozen model [here](https://dl.dropboxusercontent.com/s/rzfaoeb3e2ta343/face2face_model_epoch_200.zip). This model is trained on 400 images with epoch 200.
 
+### Adrian Babilinski - Angela Merkel 1024x1024
+
+![example](example-babilinski.gif)
+
+Pre-trained updated Anglea Merkel frozen model [here](https://1drv.ms/u/s!ArYK29BEbxyk4tBpuWzwZzfiY8arRQ?e=RPzhhs). This model is trained on 400 images with epoch 200. (.98GB)
+
 ### Karol Majek - Krzysztof Gonciarz 1024x1024
 
-Me, my face and output:
+Karol Majek face and output:
 
 ![Face2Face Gonciarz](example-gonciarz.gif)
 
@@ -159,7 +181,7 @@ Video on youtube:
 
 [![Face2Face Krzysztof Gonciarz YAPZTAJ KASIĘ CICHOPEK 4 - Zapytaj Beczkę #146](http://img.youtube.com/vi/v5VDJKCrP6A/0.jpg)](http://www.youtube.com/watch?v=v5VDJKCrP6A)
 
-Frozen model can be downloaded from [here](https://goo.gl/8BgnXA) (1.1GB)
+~~Frozen model can be downloaded from [here](https://goo.gl/8BgnXA) (1.1GB)~~ _link is broken_
 
 ## Requirements
 - [Anaconda / Python 3.5](https://www.continuum.io/downloads)
