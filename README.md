@@ -25,8 +25,12 @@ You just read original description, after this modification it is not working in
 git clone https://github.com/karolmajek/face2face-demo.git --recursive
 
 # Create the conda environment from file (Mac OSX)
-conda env create -f environment.yml
+conda env create -f environment-macosx.yml
+
+# Create the conda environment from file (Windows)
+conda env create -f environment-windows.yml
 ```
+> On Windows, make sure to switch `tensorflow-gpu` to `tensorflow` if you do not have cuda support [cuda 10](https://developer.nvidia.com/cuda-10.0-download-archive) [cuDNN v7.4.1](https://developer.nvidia.com/rdp/cudnn-archive) [instructions using cuda 9](https://medium.com/@akshaysin_86681/installing-cuda-and-cudnn-on-windows-10-f735585159f7)
 
 ### 2. Generate Training Data
 
@@ -152,6 +156,7 @@ Input:
 - `landmark-model` is the facial landmark model that is used to detect the landmarks.
 - `tf-model` is the frozen model file.
 - `save` save video to output.avi (default= 0 = false).
+
 
 ## Models
 
