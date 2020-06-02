@@ -12,8 +12,8 @@ def freeze_graph(model_folder):
 
     # We precise the file fullname of our freezed graph
     absolute_model_folder = '/'.join(input_checkpoint.split('/')[:-1])
-    output_graph = absolute_model_folder + '/frozen_model.pb'
-
+    output_graph = input_checkpoint + '/frozen_model.pb'
+ 
     # Before exporting our graph, we need to precise what is our output node
     # This is how TF decides what part of the Graph he has to keep and what part it can dump
     # NOTE: this variable is plural, because you can have multiple output nodes
@@ -39,10 +39,11 @@ def freeze_graph(model_folder):
             input_graph_def,  # The graph_def is used to retrieve the nodes
             output_node_names.split(",")  # The output node names are used to select the usefull nodes
         )
-
+ 			
         # Finally we serialize and dump the output graph to the filesystem
         with tf.gfile.GFile(output_graph, 'wb') as f:
             f.write(output_graph_def.SerializeToString())
+        print('Output saved to: '+output_graph)
         print('%d ops in the final graph.' % len(output_graph_def.node))
 
 
